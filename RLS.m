@@ -1,42 +1,39 @@
-%%file RLS.m
-function [d_hat,coe,error] = RLS(x,d,order,lambda)
-% -------------------------------------------------------------------------
-% This function implements RLS algorithm.
-% Inputs:
-% x: received signal (noisy input), x=[x(0),...,x(N)]^T
-% d: desired signal / reference signal, d=[d(0),...,d(N)]^T
-% order: if order = p, then there are p+1 filter coefficients 
-% w(0),w(1),...,w(p)
-% lambda: exponential forgetting factor
-% Outputs:
-% d_hat: estimated signal
-% coe: the stack of filter coefficients vector of each iteration
-% error: the error (d(k)-d_hat(k)) of each iteration
-% -------------------------------------------------------------------------
-% Make sure that x and d are column vectors
-x=x(:);
-d=d(:);
-N=length(x)-1;
-p=order;
-d_hat=zeros(size(d));
-error=zeros(size(d));
-coe=zeros(N+1,p+1);
-% Generates a convolution matrix
-X=convmtx(x.',p+1);
-delta=0.001;
-theta=zeros(p+1,1);
-P=1/delta*eye(p+1);
-w=P*theta;
+% RLS ALGOTITHM
+function [output, coe, error] = RLS(input, des, order, lambda)
+
+input = input(:);
+des = des(:);
+N = length(input);
+% P(:)=0;
+% theta(:) = 0;
+% w(:) = 0;
+coe=zeros(N+1,order+1);
+
+%-------------------------initialization-------------------------------%
+%----------------reset--------------%
+ output = zeros(size(des));
+ error = zeros (size(des));
+ theta = zeros (order+1,1);
+%------------initialization---------%
+delta = 0.001;
+inputX=convmtx(input.',order+1);
+%p=order;
+P=1/delta*eye(order+1);
+% theta= input(1)*des(1);
+w = P*theta;
+output(1)=w.'*inputX(:,1);
+error(1)=des(1)-output(1);
 coe(1,:)=w;
-d_hat(1)=w.'*X(:,1);
-error(1)=d(1)-d_hat(1);
-for k=2:N+1 
- P=1/lambda*P-lambda^(-2)*(P*conj(X(:,k))*X(:,k).'*P)/...
- (1+1/lambda*X(:,k).'*P*conj(X(:,k)));
- theta=lambda*theta+conj(X(:,k))*d(k);
- w=P*theta;
- coe(k,:)=w.';
- d_hat(k)=w.'*X(:,k);
- error(k)=d(k)-d_hat(k);
+%-----------start the algorithm---------%
+for k=2:N
+% P(k) = P(k-1) - P(k-1)*conj(input(k))*input(k).'*P(k-1)/1+input(k-1).'*P(k-1)*conj(input(k-1));
+% P= 1/lambda*P - lambda^(-2)*P*conj(inputX(:,k))*inputX(:,k).'*P/1+inputX(:,k).'*P*conj(inputX(:,k));
+% theta(k)=lambda*theta(k-1)+conj(input(k))*des(k);
+P=1/lambda*P-lambda^(-2)*P*conj(inputX(:,k))*inputX(:,k).'*P/(1+1/lambda*inputX(:,k).'*P*conj(inputX(:,k))); %update value of Pn
+theta=lambda*theta+conj(inputX(:,k))*des(k); %update value of theta
+w=P*theta;
+coe(k,:)=w.'; %coefficient..taps
+output(k)=w.'*inputX(:,k); %find output
+error(k)=des(k)-output(k); %calculate error
 end
 end

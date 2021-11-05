@@ -1,4 +1,5 @@
-% XUAN GAO MILLA EE4C03 ECG ADAPTIVE NOISE CANCELLING ASSIGNMENT
+% XUAN GAO MILLA EE4C03 ECG ADAPTIVE NOISE CANCELLATION ASSIGNMENT
+% 05-11-2021
 
 clc
 clear all
@@ -12,6 +13,7 @@ xlabel('Samples(n)');
 ylabel('Amplitude(mV)'); ylim([-1 1]);
 title('Clean ECG Signals');
 
+% Set the scale to mV
 WN_data = WN_data/200;
 wn = wn/200;
 BWN_data = BWN_data/200;
@@ -21,6 +23,7 @@ emn = emn/200;
 MAN_data = MAN_data/200;
 man = man/200;
 
+% Generate PLI noise
 datalength = 5000;
 fs = 500;
 fn = 50;
@@ -28,6 +31,8 @@ pli(:)=0;
 for i=1:datalength
     pli(:,i) = 0.1*sin(2*pi*fn*i/fs);
 end
+
+% Generate corrupted ECG signals with PLI noise
 PLI_data = (Data1 + pli);
 
 %------------------------LMS ALGORITHM-------------------------
