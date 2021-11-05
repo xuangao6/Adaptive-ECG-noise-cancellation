@@ -1,5 +1,6 @@
 # **EE4C03 Adaptive ECG Noice Cancellation**
 **Time: 05-11-2021**  
+**Student: Xuan Gao. Milla Rahmadiva**  
 All our simulations are tested on **MATLAB R2021b**
 ## **How To Verify Our Work**
 Please follow the steps below.  
